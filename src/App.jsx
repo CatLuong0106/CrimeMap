@@ -2,8 +2,8 @@ import { Loader } from '@googlemaps/js-api-loader'
 import './App.css'
 
 function App() {
-  const center = { lat: 39.132007245791385, lng: -84.51562682302736 };
-  const zoom = 15;
+  let center = { lat: 39.152007245589185, lng: -84.51562682302536 };
+  const zoom = 14;
   const loader = new Loader({
     apiKey: "AIzaSyCHgrOkqzasqmym75emtsg0JppEb-Ew56c",
     version: "weekly",
@@ -14,6 +14,7 @@ function App() {
   loader.load().then(async () => {
     const { Map } = await google.maps.importLibrary("maps");
     map = new Map(document.getElementById("map"), { center, zoom })
+    map.data.loadGeoJson('clifton.geojson');
   })
 
   return (
