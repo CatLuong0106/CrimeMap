@@ -1,34 +1,24 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { Loader } from '@googlemaps/js-api-loader'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const center = { lat: 39.132007245791385, lng: -84.51562682302736 };
+  const zoom = 15;
+  const loader = new Loader({
+    apiKey: "AIzaSyCHgrOkqzasqmym75emtsg0JppEb-Ew56c",
+    version: "weekly",
+  })
+
+  let map;
+
+  loader.load().then(async () => {
+    const { Map } = await google.maps.importLibrary("maps");
+    map = new Map(document.getElementById("map"), { center, zoom })
+  })
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div id="map">
+    </div>
   )
 }
 
