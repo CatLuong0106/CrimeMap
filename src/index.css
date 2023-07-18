@@ -1,23 +1,24 @@
 * {
-  /* outline: 0.5px solid yellow; */
   margin: 0;
   padding: 0;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
 }
 
 body {
-  background: lightblue;
-  display: flex;
-  flex-direction: column;
+  --navpad: 40px;
+  background: transparent;
   height: 100vh;
   width: 100vw;
 }
 
 #root {
-  background: lightpink;
-  flex: 1;
-}
-
-#map {
-  width: 100%;
   height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }

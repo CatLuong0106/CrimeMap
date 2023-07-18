@@ -1,0 +1,34 @@
+main {
+    flex: 1;
+    height: 100%;
+    width: 100%;
+}
+
+nav {
+    background: red;
+    color: white;
+    font-size: 2em;
+    height: 100px;
+    width: calc(100% - var(--navpad) * 2);
+    display: flex;
+    align-items: center;
+    gap: var(--navpad);
+    padding-left: var(--navpad);
+    padding-right: var(--navpad);
+}
+
+nav #title {
+    display: flex;
+}
+
+nav .others {
+    display: flex;
+    flex: 1;
+    gap: var(--navpad);
+    justify-content: flex-end;
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+}
