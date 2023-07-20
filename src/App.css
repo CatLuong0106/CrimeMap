@@ -2,13 +2,14 @@ main {
     flex: 1;
     height: 100%;
     width: 100%;
+    display: flex;
 }
 
 nav {
     background: red;
     color: white;
-    font-size: 2em;
-    height: 100px;
+    font-size: 1.5em;
+    height: 60px;
     width: calc(100% - var(--navpad) * 2);
     display: flex;
     align-items: center;
@@ -31,4 +32,28 @@ nav .others {
 #map {
     height: 100%;
     width: 100%;
+    flex: 3;
+}
+
+#dashboard {
+    flex: 2;
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#dashboard fieldset {
+    gap: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+#dashboard .option {
+    margin: 10px;
+}
+
+#dashboard button {
+    padding: 5px;
 }
