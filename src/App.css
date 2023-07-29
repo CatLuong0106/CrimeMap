@@ -33,6 +33,7 @@ nav .others {
     height: 100%;
     width: 100%;
     flex: 3;
+    background: silver;
 }
 
 #dashboard {
@@ -56,4 +57,24 @@ nav .others {
 
 #dashboard button {
     padding: 5px;
+}
+
+.map-marker {
+    background: #5491f5;
+    color: white;
+    font-size: 1.25em;
+    padding: 5px;
+    width: max-content;
+    border-radius: 5px;
+    transform: translate(0,-10px);
+}
+.map-marker::before {
+    position: absolute;
+    content: '';
+    display: block;
+    border: 10px solid transparent;
+    border-top: 10px solid #5491f5;
+    left: 50%;
+    bottom: 0;
+    transform: translate(-50%, 90%);
 }
