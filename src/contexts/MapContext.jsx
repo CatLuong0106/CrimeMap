@@ -20,7 +20,7 @@ export const MapProvider = ({ children }) => {
     const [map, setMap] = useState(undefined)
 
     useEffect(() => {
-        updateDrawingMode(drawMode)
+        updateDrawingMode(map, drawMode)
     }, [drawMode])
 
     const initMap = () => {
@@ -39,15 +39,12 @@ export const MapProvider = ({ children }) => {
     }
 
     const computeFeature = (feature) => {
-        console.color("Computing features", "yellow", "purple")
+        console.log("TODO: Optimize computeFeature to so that the feature state is not reset when not needed be")
         setFeatures(prevFeatures => prevFeatures.concat([feature]))
-        // let type = feature.j.split("/")[0]
-        // let visible = type != "node";
-        // return { visible };
+        return { visible: true }
     }
 
     const changeThemeColorOfAll = (newColor) => {
-        console.color("Changing all theme color", 'yellow', 'purple');
         for (const feature of features) {
             map.data.overrideStyle(feature, {
                 fillColor: newColor,
@@ -56,10 +53,14 @@ export const MapProvider = ({ children }) => {
         }
     }
 
-    const updateDrawingMode = (mode) => {
-        console.color("Updating drawing mode", 'yellow', 'purple')
-        if (mode != "Point" && mode != "LineString" && mode != "Polygon") mode = null
-        if (map && map.data) map.data.setDrawingMode(mode);
+    const updateDrawingMode = (map, mode) => {
+        if (!(map && map.data)) return
+        switch (mode) {
+            case "Point":
+            case "LineString":
+            case "Polygon": map.data.setDrawingMode(mode); break
+            default: map.data.setDrawingMode(null); break
+        }
     }
 
     return (
