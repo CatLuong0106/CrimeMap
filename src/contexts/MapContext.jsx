@@ -33,20 +33,6 @@ export const MapProvider = ({ children }) => {
             for (const geojson of geojsons) { newMap.data.loadGeoJson(geojson) }
             newMap.data.setStyle(computeFeature)
 
-            newMap.addListener('click', (e) => {
-                let lat = e.latLng.lat()
-                let lng = e.latLng.lng()
-                console.color(`Latitude: ${lat}`, 'yellow', 'purple')
-                console.color(`Longitude: ${lng}`, 'yellow', 'purple')
-            })
-            
-            newMap.data.addListener('click', (e) => {
-                console.log(e.feature.getGeometry().getType())
-                let lat = e.latLng.lat()
-                let lng = e.latLng.lng()
-                console.color(`Latitude: ${lat}`, 'yellow', 'purple')
-                console.color(`Longitude: ${lng}`, 'yellow', 'purple')
-            })
 
             setMap(newMap);
         })
