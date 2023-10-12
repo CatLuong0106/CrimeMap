@@ -3,13 +3,15 @@ main {
     height: 100%;
     width: 100%;
     display: flex;
+    position: relative;
+    overflow: hidden;
 }
 
 nav {
+    min-height: 60px;
     background: red;
     color: white;
     font-size: 1.5em;
-    height: 60px;
     width: calc(100% - var(--navpad) * 2);
     display: flex;
     align-items: center;
@@ -32,49 +34,172 @@ nav .others {
 #map {
     height: 100%;
     width: 100%;
-    flex: 3;
+    flex: 5;
     background: silver;
 }
 
 #dashboard {
-    flex: 2;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    transition: 0.5s;
+    flex: 0;
     display: flex;
     gap: 10px;
     flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    position: relative;
+    background: white;
+}
+
+#dashboard.half-view {
+    flex: 5;
+}
+
+.map-marker {
+    transition: 0.5s;
+    color: black;
+    font-size: 1.25em;
+    width: max-content;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.5s;
+}
+
+.test-class {
+    background: green;
+}
+
+.marker-crime-score {
+    transition: 0.5s;
+    cursor: pointer;
+    background: red;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+.close-button {
+    transition: 0.2s;
+    background: transparent;
+    color: black;
+    padding: 10px 11px 10px 12px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+}
+
+.close-button:hover {
+    color: red;
+    /* background: lightgray; */
+}
+
+.big-crime-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 100%;
+    background: lightgray;
+    display: flex;
     justify-content: center;
     align-items: center;
 }
 
-#dashboard fieldset {
+.dashboard-head {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.dashboard-title {
+    padding: 10px;
+    font-size: 2em;
+    flex: 1;
+    text-align: center;
+    font-weight: 700;
+}
+
+.dashboard-display {
+    width: calc(100% - 20px);
+    margin: 20px;
+    display: flex;
+    /* justify-content: ; */
+    flex-direction: row;
+    flex-wrap: wrap;
     gap: 10px;
-    padding-left: 10px;
-    padding-right: 10px;
 }
 
-#dashboard .option {
-    margin: 10px;
+.dashboard-section {
+    flex: 1;
+    border: 1px solid gray;
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
 }
 
-#dashboard button {
-    padding: 5px;
-}
-
-.map-marker {
-    background: #5491f5;
+.dashboard-section-title {
+    background: red;
     color: white;
-    font-size: 1.25em;
+    padding: 10px;
+}
+
+.dashboard-section-content {
+    flex: 1;
+    display: grid;
+    place-items: center;
+}
+
+.rank-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+}
+
+.rank-title {
+    flex: 1;
+    padding: 5px;
+    /* outline: 1px solid black; */
+    line-break: strict;
+}
+
+.rank-value {
+    /* flex: 1; */
     padding: 5px;
     width: max-content;
-    border-radius: 5px;
-    transform: translate(0,-10px);
+    /* outline: 1px solid black; */
 }
-.map-marker::before {
-    position: absolute;
-    content: '';
-    display: block;
-    border: 10px solid transparent;
-    border-top: 10px solid #5491f5;
-    left: 50%;
-    bottom: 0;
-    transform: translate(-50%, 90%);
+
+.graph img {
+    width: 100%;
+}
+
+.graphical-section {
+    min-width: 200px;
+}
+
+.fade-in-start {
+    transition: 0.5s;
+    opacity: 0;
+}
+
+.fade-in-end {
+    opacity: 1;
+}
+
+@keyframes fade-in {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, 50%);
+    }
+    
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
 }
