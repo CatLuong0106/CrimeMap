@@ -1,24 +1,31 @@
 import React, { useState } from 'react';
 import { useMap } from '../contexts/MapContext';
-import getRandomColor from '../utils/RandomColor';
+import CrimeCircle from './CrimeCircle';
+import DashboardSection from './DashboardSection';
+import Ranking from './Ranking';
+import Graph from './Graph';
 
 const Dashboard = () => {
-    const { changeThemeColorOfAll, setDrawMode } = useMap();
-
-    const onChangeColor = () => { changeThemeColorOfAll(getRandomColor()); }
-    const onDrawModeChange = (event) => {
-        setDrawMode(event.target.value)
-    }
+    const { dashboardData, closeDashboard, toggleHeatmap } = useMap()
+    // console.log(dashboardData)
 
     return (
-        <div id="dashboard">
+        <div id="dashboard" className='half-view'>
+            <div className='dashboard-head'>
+                <div className='dashboard-title'>{dashboardData.name}</div>
+                <button className='close-button' onClick={(e) => closeDashboard()}>✖</button>
+            </div>
+            <div className='dashboard-display'>
+                <DashboardSection sectionTitle={'Area Crime Score'}>
+                    <CrimeCircle>{dashboardData.crimeScore ? dashboardData.crimeScore.toFixed() : 0}</CrimeCircle>
+                </DashboardSection>
+                <DashboardSection sectionTitle={'Top Offenses Count in Area, 2010 - 2023'}>
+                    <Ranking offenses={dashboardData.offenses}></Ranking>
+                </DashboardSection>
+                <DashboardSection sectionTitle={'Crime Count By Year'} extraClassNames={'graphical-section'}>
+                    <Graph src={"/CrimeDistByYear.png"}></Graph>
+                </DashboardSection>
 
-            <button onClick={onChangeColor} >Change color</button>
-            <div onChange={onDrawModeChange}>
-                <div><input type="radio" name="drawmode" value="None" /> Disable drawing mode</div>
-                <div><input type="radio" name="drawmode" value="Point" /> Draw Points</div>
-                <div><input type="radio" name="drawmode" value="LineString" /> Draw Lines</div>
-                <div><input type="radio" name="drawmode" value="Polygon" /> Draw Polygon</div>
             </div>
         </div>
     );
