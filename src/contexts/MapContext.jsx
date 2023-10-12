@@ -1,136 +1,176 @@
+import React, { useState, useContext, useEffect } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
-import React, { useEffect, useState, useContext } from "react";
-import data from '../assets/clifton';
+import { addGeometry, addAdvancedMarker, addMarker, addInfoWindow } from "../utils/MapTools";
+import { baseStyle, hoveredStyle, selectedStyle } from "../utils/PolygonStyle";
+import { enableClass, disableClass } from "../utils/DOMManipulation";
+import { fetchAllPolygons } from "../utils/Area";
+import { fetchCrimeScores, fetchDataPoints, fetchTotalOffenses, fetchOffensesByArea } from "../utils/BackendData";
+import { mapStyle } from "../utils/MapStyle";
 
 export const MapContext = React.createContext();
 export const useMap = () => useContext(MapContext)
 
-export const addGeometry = (type, map, coords) => {
-    return map.data.add({ geometry: new google.maps.Data[type](coords) })  
-}
-
-export const addAdvancedMarker = (marker, map, coords, content) => {
-    return new marker({
-        map: map,
-        position: coords,
-        content: (() => {
-            const el = document.createElement('div')
-            el.classList.add('map-marker')
-            el.innerText = content
-            return el
-        })()
-    })
-}
-
 export const MapProvider = ({ children }) => {
-    // Map info
-    const center = ({ lat: 39.15, lng: -84.52 })
+    // MAP INFO
+    const center = ({ lat: 39.14, lng: -84.51 })
     const zoom = 13;
     const apiKey = import.meta.env.VITE_GOOGLE_MAP_API_KEY || process.env.VITE_GOOGLE_MAP_API_KEY;
-    const mapId = import.meta.env.VITE_GOOGLE_MAP_ID || process.env.VITE_GOOGLE_MAP_ID;
+    const mapId = 'f8e45468a0959e80' || 'DEMO_MAP_ID' || import.meta.env.VITE_GOOGLE_MAP_ID || process.env.VITE_GOOGLE_MAP_ID || "DEMO_MAP_ID";
     const version = "weekly"
-    const geojsons = [];
 
-    const [features, setFeatures] = useState([]);
-    const [drawMode, setDrawMode] = useState(null);
-    const [map, setMap] = useState(null)
-    const [loaded, setLoaded] = useState(false)
-    const [fetchData, setFetchData] = useState(null);
-
-    useEffect(() => {
-        const fetchCincyCrimeData = async () => {
-            try {
-                const response = await fetch('https://data.cincinnati-oh.gov/resource/k59e-2pvf.json');
-                const jsonData = await response.json();
-                setFetchData(jsonData);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-        fetchCincyCrimeData()
-    }, [])
+    // STATES
+    const [mapFeatures, setMapFeatures] = useState([]);
+    const [map, setMap] = useState(null);
+    const [dashboardData, setDashboardData] = useState('');
+    const [currentArea, setCurrentArea] = useState('');
+    const [heatmap, setHeatmap] = useState(null);
+    const [dashboardDataByArea, setDashboardDataByArea] = useState({ '': { crimeScore: 0, offenses: {} } })
 
     useEffect(() => {
-        if (!fetchData || !map || loaded || 1 == 1) { return }
-        for (const point of fetchData) {
-            addGeometry('Point', map, {
-                lat: parseFloat(point['latitude_x']),
-                lng: parseFloat(point['longitude_x']),
-            })
-        }
-        setLoaded(true)
+        console.log(dashboardDataByArea, currentArea)
+        setDashboardData(dashboardDataByArea[currentArea])
+    }, [currentArea])
 
-    }, [fetchData, map])
-
-    useEffect(() => {
-        updateDrawingMode(map, drawMode)
-    }, [drawMode])
-
+    // FUNC TO EXPORT MAP,  
     const initMap = () => {
-        console.log("Initiating map")
-        const loader = new Loader({ apiKey, version })
-        let newMap;
+        const loader = new Loader({ apiKey, version, libraries: ['visualization'] })
+
         loader.load().then(async () => {
-            const { Map } = await google.maps.importLibrary("maps");
-            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker")
-            
-            newMap = new Map(document.getElementById("map"), { center, zoom, mapId });
-            addAdvancedMarker(AdvancedMarkerElement, newMap, { lat: 39.15, lng: -84.52 }, 'CLIFTON')
-            
-            for (const geojson of geojsons) { newMap.data.loadGeoJson(geojson) }
-            for (const feature of data.features) {
+            console.log(center.lat + 0.2)
+            // CREATE MAP
+            const newMap = await new google.maps.Map(document.getElementById("map"), {
+                center, zoom, styles: mapStyle,
+                minZoom: zoom - 3,
+                maxZoom: zoom + 3,
+                restriction: {
+                    latLngBounds: {
+                        north: center.lat + 0.05,
+                        south: center.lat - 0.05,
+                        east: center.lng + 0.05,
+                        west: center.lng - 0.05,
+                    },
+                },
+            });
 
-                let geometry = feature['geometry']
-                let type = geometry['type']
-                let coords = geometry['coordinates']
-                let newCoords;
+            setMap(newMap);
 
-                switch (type) {
-                    case 'Point':
-                        newCoords = { lat: coords[1], lng: coords[0] }
-                        break
-                    case 'LineString':
-                        newCoords = coords.map(c => ({ lat: c[1], lng: c[0] }))
-                        break
-                    case 'Polygon':
-                        newCoords = coords.map(c => c.map((path) => ({ lat: path[1], lng: path[0] })))
-                        break
+            // ADD FEATURES TO MAP AND SAVE THEIR IDS FOR QUERYING
+            const mapFeaturesToAdd = []
+            let polygons = localStorage.getItem('polygons')
+            polygons = polygons ? JSON.parse(polygons) : await fetchAllPolygons()
+            const crimeScores = await fetchCrimeScores()
+            const offensesByArea = await fetchOffensesByArea()
+
+            for (const polygon of Object.values(polygons)) {
+
+                const centerCoords = polygon.properties.center.geometry.coordinates
+                const polygonName = polygon.properties.name
+                const markerContent = `
+                <div class='marker-crime-score'>${crimeScores[polygonName].toFixed()}</div>
+                ${polygonName} ↗
+                `
+                const infoWindow = await addInfoWindow(newMap, { lat: centerCoords[1], lng: centerCoords[0] }, markerContent)
+
+                dashboardDataByArea[polygonName] = {
+                    name: polygonName,
+                    crimeScore: crimeScores[polygonName],
+                    offenses: offensesByArea[polygonName]
                 }
-                if (newCoords) addGeometry(type, newMap, newCoords)
+
+                infoWindow.content.addEventListener('click', (e) => {
+                    enableClass('#dashboard', 'half-view')
+                    setCurrentArea(polygonName)
+                    for (const mapFeature of mapFeaturesToAdd) {
+                        const { marker } = mapFeature
+                        marker.map = null
+                    }
+                })
+
+                const coords = polygon['geometry']['coordinates']
+                coords[0] = coords[0].map(c => ({ lat: c[1], lng: c[0] }))
+                let polygonFeature = await addGeometry("Polygon", polygon['id'], newMap, coords, polygon.properties)
+
+                const mapFeature = {
+                    id: polygonFeature.getId(),
+                    feature: polygonFeature,
+                    name: polygonName,
+                    marker: infoWindow,
+                }
+
+                mapFeaturesToAdd.push(mapFeature)
+
             }
 
-            newMap.data.setStyle(computeFeature)
-            setMap(newMap);
+            const data_points = await fetchDataPoints()
+            const heatmap_data = []
+
+            for (const data_point of data_points) {
+                const lat = data_point.latitude_x
+                const lng = data_point.longitude_x
+                heatmap_data.push(new google.maps.LatLng(lat, lng),)
+            }
+
+            const hm = await new google.maps.visualization.HeatmapLayer({
+                data: heatmap_data,
+                map: newMap,
+                opacity: 1,
+            });
+
+            setHeatmap(hm)
+            setMapFeatures(mapFeaturesToAdd)
+
+            // SET STYLE BASED ON SELECTION STATE
+            newMap.data.setStyle((feature) => {
+                console.log('set style')
+                let isSelected = feature.getProperty('selected')
+                return isSelected ? selectedStyle : baseStyle
+            })
+
+            // EVENT LISTENERS
+            newMap.data.addListener('click', (e) => {
+                newMap.data.revertStyle()
+                
+                for (const { id, marker } of mapFeaturesToAdd) {
+                    console.log(e.feature.getId(), id)
+                    if (id == e.feature.getId()) {
+                        console.log('true')
+                        e.feature.setProperty('selected', true)
+                        
+                        marker.open({ map: newMap })
+                        const windowContainer = marker.content.parentNode.parentNode
+                        const windowContainerArrow = windowContainer.nextSibling
+                        windowContainer.style.animation = 'fade-in 0.5s 1 forwards'
+                        windowContainerArrow.style.display = 'none'
+                    } else {
+                        console.log('false')
+                        newMap.data.getFeatureById(id).setProperty('selected', false)
+                        marker.close()
+                    }
+                }
+            })
+
+            newMap.data.addListener('mouseover', (e) => {
+                newMap.data.revertStyle()
+                let isSelected = e.feature.getProperty('selected')
+                if (!isSelected) newMap.data.overrideStyle(e.feature, hoveredStyle)
+            })
+
+            newMap.data.addListener('mouseout', (e) => {
+                newMap.data.revertStyle()
+            })
         })
     }
 
-    const computeFeature = (feature) => {
-        console.log("TODO: Optimize computeFeature to so that the feature state is not reset when not needed be")
-        setFeatures(prevFeatures => prevFeatures.concat([feature]))
-        return { visible: true }
-    }
+    const closeDashboard = () => { disableClass('#dashboard', 'half-view') }
 
-    const changeThemeColorOfAll = (newColor) => {
-        for (const feature of features) {
-            map.data.overrideStyle(feature, {
-                fillColor: newColor,
-                strokeColor: newColor,
-            })
-        }
-    }
-
-    const updateDrawingMode = (map, mode) => {
-        if (!(map && map.data)) return
-        switch (mode) {
-            case "Point":
-            case "LineString":
-            case "Polygon": map.data.setDrawingMode(mode); break
-            default: map.data.setDrawingMode(null); break
-        }
+    const toggleHeatmap = () => {
+        let curOpacity = heatmap.get('opacity')
+        let newOpacity = curOpacity == 1 ? 0 : 1
+        heatmap.set('opacity', newOpacity)
     }
 
     return (
-        <MapContext.Provider value={{ initMap, changeThemeColorOfAll, setDrawMode }}>
+        <MapContext.Provider value={{ initMap, dashboardData, currentArea, closeDashboard, toggleHeatmap }}>
             {children}
         </MapContext.Provider>
     )
