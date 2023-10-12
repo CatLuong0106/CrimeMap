@@ -11,8 +11,14 @@
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.16.2",
+    "@turf/boolean-contains": "^6.5.0",
+    "@turf/boolean-overlap": "^6.5.0",
+    "@turf/difference": "^6.5.0",
+    "@turf/turf": "^6.5.0",
+    "osmtogeojson": "^3.0.0-beta.5",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.15.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.14",
