@@ -1,13 +1,17 @@
 import React from 'react';
+import { convertToTitleCase } from '../utils/StringTools';
 
 const Ranking = ({ offenses }) => {
     const rankColor = ['#022C49', '#016FB9', '#22AED1']
 
     let offensesList = []
     for (let offenseName in offenses) {
-        offensesList.push([offenseName.replace('/', ' / '), offenses[offenseName]])
+        offensesList.push([
+            convertToTitleCase(offenseName.replace('/', ' / ')),
+            offenses[offenseName]
+        ])
     }
-    offensesList.sort((a, b) => {return b[1] - a[1]})
+    offensesList.sort((a, b) => { return b[1] - a[1] })
 
     return (
         <div className='rank' color='red'>
