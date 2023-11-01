@@ -90,12 +90,15 @@ nav .others {
     padding: 10px 11px 10px 12px;
     cursor: pointer;
     border: none;
-    border-radius: 5px;
+    position: absolute;
+    right: 0px;
+    transform-origin: center;
+    font-size: 1.8em;
 }
 
 .close-button:hover {
     color: red;
-    /* background: lightgray; */
+    font-size: 2em;
 }
 
 .big-crime-circle {
@@ -113,6 +116,7 @@ nav .others {
     width: 100%;
     justify-content: center;
     align-items: center;
+    position: relative;
 }
 
 .dashboard-title {
@@ -120,14 +124,23 @@ nav .others {
     font-size: 2em;
     flex: 1;
     text-align: center;
-    font-weight: 700;
+    font-weight: 600;
+    text-decoration-color: red;
+    text-decoration-line: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 3px;
 }
 
 .dashboard-display {
     width: calc(100% - 20px);
     margin: 20px;
-    display: flex;
-    /* justify-content: ; */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    grid-template-areas:
+        "score rank"
+        "graph1 graph1"
+        "graph2 graph2";
     flex-direction: row;
     flex-wrap: wrap;
     gap: 10px;
@@ -136,21 +149,27 @@ nav .others {
 .dashboard-section {
     flex: 1;
     border: 1px solid gray;
+    background: rgba(222, 222, 222, 0.4);
     display: flex;
     flex-direction: column;
     max-width: 100%;
+    border-radius: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.6);
+    overflow: hidden;
 }
 
 .dashboard-section-title {
-    background: red;
+    background: rgba(255, 0, 0, 1);
     color: white;
     padding: 10px;
+    font-weight: 400;
 }
 
 .dashboard-section-content {
     flex: 1;
     display: grid;
     place-items: center;
+    padding: 20px;
 }
 
 .rank-item {
@@ -164,7 +183,6 @@ nav .others {
 .rank-title {
     flex: 1;
     padding: 5px;
-    /* outline: 1px solid black; */
     line-break: strict;
 }
 
@@ -172,11 +190,18 @@ nav .others {
     /* flex: 1; */
     padding: 5px;
     width: max-content;
-    /* outline: 1px solid black; */
 }
 
 .graph img {
     width: 100%;
+}
+
+.graph1 {
+    grid-area: graph1;
+}
+
+.graph2 {
+    grid-area: graph2;
 }
 
 .graphical-section {
@@ -197,7 +222,7 @@ nav .others {
         opacity: 0;
         transform: translate(-50%, 50%);
     }
-    
+
     100% {
         opacity: 1;
         transform: translate(-50%, -50%);
