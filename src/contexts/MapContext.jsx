@@ -69,7 +69,7 @@ export const MapProvider = ({ children }) => {
                 <div class='marker-crime-score'>${crimeScores[polygonName].toFixed()}</div>
                 ${polygonName} ↗
                 `
-                const infoWindow = await addInfoWindow(newMap, { lat: centerCoords[1], lng: centerCoords[0] }, markerContent)
+                const infoWindow = await addInfoWindow(null, { lat: centerCoords[1], lng: centerCoords[0] }, markerContent)
 
                 dashboardDataByArea[polygonName] = {
                     name: polygonName,
@@ -82,7 +82,7 @@ export const MapProvider = ({ children }) => {
                     setCurrentArea(polygonName)
                     for (const mapFeature of mapFeaturesToAdd) {
                         const { marker } = mapFeature
-                        marker.map = null
+                        marker.close()
                     }
                 })
 
@@ -133,7 +133,6 @@ export const MapProvider = ({ children }) => {
                 for (const { id, marker } of mapFeaturesToAdd) {
                     console.log(e.feature.getId(), id)
                     if (id == e.feature.getId()) {
-                        console.log('true')
                         e.feature.setProperty('selected', true)
                         
                         marker.open({ map: newMap })
