@@ -7,7 +7,6 @@ import Graph from './Graph';
 
 const Dashboard = () => {
     const { dashboardData, closeDashboard, toggleHeatmap } = useMap()
-    // console.log(dashboardData)
 
     return (
         <div id="dashboard" className='half-view'>
@@ -23,10 +22,10 @@ const Dashboard = () => {
                     <Ranking offenses={dashboardData.offenses}></Ranking>
                 </DashboardSection>
                 <DashboardSection sectionTitle={'Crime Count By Year'} extraClassNames={'graphical-section graph1'}>
-                    <Graph src={"/CrimeDistByYear.png"}></Graph>
+                    <Graph src={`/crime_per_year/${dashboardData.name}.png`}></Graph>
                 </DashboardSection>
                 <DashboardSection sectionTitle={'Crime Count By Year'} extraClassNames={'graphical-section graph2'}>
-                    <Graph src={"/Top5Crimes2023.png"}></Graph>
+                    <Graph src={`/top_five_crime/${dashboardData.name}.png`}></Graph>
                 </DashboardSection>
 
             </div>
