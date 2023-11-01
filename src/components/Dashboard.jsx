@@ -22,8 +22,11 @@ const Dashboard = () => {
                 <DashboardSection sectionTitle={'Top Offenses Count in Area, 2010 - 2023'}>
                     <Ranking offenses={dashboardData.offenses}></Ranking>
                 </DashboardSection>
-                <DashboardSection sectionTitle={'Crime Count By Year'} extraClassNames={'graphical-section'}>
+                <DashboardSection sectionTitle={'Crime Count By Year'} extraClassNames={'graphical-section graph1'}>
                     <Graph src={"/CrimeDistByYear.png"}></Graph>
+                </DashboardSection>
+                <DashboardSection sectionTitle={'Crime Count By Year'} extraClassNames={'graphical-section graph2'}>
+                    <Graph src={"/Top5Crimes2023.png"}></Graph>
                 </DashboardSection>
 
             </div>
